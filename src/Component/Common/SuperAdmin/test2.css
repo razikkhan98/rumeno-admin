@@ -1,0 +1,80 @@
+.register {
+  height: 100vh;
+  background: linear-gradient(
+    to right,
+    rgba(57, 49, 175, 1) 0,
+    rgba(0, 198, 255, 1) 100%
+  );
+}
+
+@media (max-width: 991px) {
+  .register .register-form {
+    margin-top: 16%;
+  }
+}
+@media (max-width: 667px) {
+  .register .register-form {
+    margin-top: 20%;
+  }
+}
+
+.register-right {
+  background: #f8f9fa;
+  border-top-left-radius: 10% 50%;
+  border-bottom-left-radius: 10% 50%;
+}
+
+@media (max-width: 991px) {
+  .register-heading {
+    font-size: 1.5rem;
+  }
+}
+
+/*  */
+
+.file-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.file-upload-label {
+  cursor: pointer;
+}
+
+.file-upload-box {
+  margin: 0 auto;
+  border: 2px dashed aquamarine;
+  border-radius: 30px;
+  padding: 15px 40px;
+  display: flex;
+  flex-direction: column;
+  height: 9rem;
+  width: 19rem;
+  text-align: center;
+  overflow: hidden;
+  justify-content: center;
+}
+
+.file-icon-1 {
+  
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+.file-icon-2 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.file-placeholder {
+  color: #7f8c8d;
+}
+
+.file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  text-align: center;
+  display: none;
+}
