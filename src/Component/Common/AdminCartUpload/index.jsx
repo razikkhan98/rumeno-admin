@@ -22,21 +22,21 @@ const AdminCartUpload = () => {
 
 
   const handleFileChange = (e) => {
+    if (e.target.files.length === 0) {
+      console.warn("No file selected");
+      return; // Exit the function early if no file is selected
+    }
+  
     const files = Array.from(e.target.files);
-    setSelectedFile(files);
-
-    const fileUrls = files.map(file => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      return new Promise((resolve) => {
-        reader.onload = () => resolve(reader.result);
-      });
-    });
-
-    Promise.all(fileUrls).then(urls => {
-      setImageUrl(urls);
-    });
+    setSelectedFile(files[0]);
+  
+    const reader = new FileReader();
+    reader.readAsDataURL(files[0]);
+    reader.onload = () => {
+      setImageUrl(reader.result);
+    };
   };
+  
 
 
 
@@ -87,12 +87,12 @@ const AdminCartUpload = () => {
     }
   };
 
+  // ------------
   const [loading, setLoading] = useState(false);
+  // -------------
 
 
 
-
-  
   const onsubmit = async (data) => {
     setLoading(true)
 

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { Modal } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import Mean from "../Mean";
 import Navbar from "../Navbar";
 import axios from 'axios';
-import dummy from '../../assets/img/products/istockphoto-1409329028-612x612.jpg'
+import dummy from '../../assets/img/products/istockphoto-1409329028-612x612.jpg';
 
 const AdminCartUpload = () => {
   const [blogs, setBlogs] = useState([]);
@@ -15,7 +15,7 @@ const AdminCartUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, reset, setValue } = useForm();
+  const { register, handleSubmit, reset, setValue, control } = useForm();
   const apiUrl = `${process.env.REACT_APP_API}`;
   const apiKey = "273ab24b40be59dc593d96c50976ae42";
 
@@ -45,14 +45,17 @@ const AdminCartUpload = () => {
   }, []);
 
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    setSelectedFile(files[0]);
+    try {
+      const files = Array.from(e?.target?.files);
+      setSelectedFile(files[0]);
 
-    const reader = new FileReader();
-    reader.readAsDataURL(files[0]);
-    reader.onload = () => {
-      setImageUrl(reader.result);
-    };
+      const reader = new FileReader();
+      reader.readAsDataURL(files[0]);
+      reader.onload = () => {
+        setImageUrl(reader?.result);
+      };
+    }
+    catch (error) { console.log(error) }
   };
 
   const fetchItems = async () => {
@@ -146,6 +149,7 @@ const AdminCartUpload = () => {
       console.error('Error deleting item:', error);
     }
   };
+
   const modules = {
     toolbar: {
       container: [
@@ -193,15 +197,20 @@ const AdminCartUpload = () => {
                 </Modal.Header>
                 <Modal.Body className='p-2'>
                   <form className='w-100' onSubmit={handleSubmit(onSubmit)}>
-                    <ReactQuill
-                      {...register('content')}
-                      onChange={(content) => setValue('content', content)}
-                      modules={modules}
-                      className='w-auto'
+                    <Controller
+                      name="content"
+                      control={control}
+                      render={({ field }) => (
+                        <ReactQuill
+                          {...field}
+                          modules={modules}
+                          className='w-auto'
+                        />
+                      )}
                     />
                     <div className='row mt-4 justify-content-around'>
                       <div className="col-lg-5 my-2">
-                        <label className="form-label" for="heading">
+                        <label className="form-label" htmlFor="heading">
                           Main Heading
                         </label>
                         <textarea rows={3}
@@ -210,12 +219,11 @@ const AdminCartUpload = () => {
                           type="text"
                           id="heading"
                           className="form-control"
-                          value={blogs.heading}
                           {...register("heading")}
                         />
                       </div>
                       <div className="col-lg-5 my-2">
-                        <label className="form-label" for="description">
+                        <label className="form-label" htmlFor="description">
                           Description
                         </label>
                         <textarea rows={3}
@@ -224,13 +232,12 @@ const AdminCartUpload = () => {
                           type="text"
                           id="description"
                           className="form-control"
-                          value={blogs.description}
                           {...register("description")}
                         />
                       </div>
 
                       <div className="col-lg-5 my-2">
-                        <label className="form-label fw-bold" for="keywords">
+                        <label className="form-label fw-bold" htmlFor="keywords">
                           Keywords
                         </label>
                         <textarea rows={3}
@@ -239,7 +246,6 @@ const AdminCartUpload = () => {
                           type="text"
                           id="keywords"
                           className="form-control"
-                          value={blogs.keywords}
                           {...register("keywords")}
                         />
                       </div>
@@ -296,4 +302,3 @@ const AdminCartUpload = () => {
 };
 
 export default AdminCartUpload;
-
