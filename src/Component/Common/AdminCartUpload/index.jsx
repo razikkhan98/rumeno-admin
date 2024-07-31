@@ -87,9 +87,7 @@ const AdminCartUpload = () => {
     }
   };
 
-  // ------------
   const [loading, setLoading] = useState(false);
-  // -------------
 
 
 
