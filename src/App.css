@@ -1,3 +1,9 @@
-/* .card-img {
-    height: 15rem;
-} */
+.prd-card{
+    width: 24rem;
+}
+.modal-dialog,.modal-size{
+    max-width: 90% !important;
+}
+.card{
+    height: 29rem;
+}

@@ -34,10 +34,16 @@ const Mean = () => {
                 <div data-i18n="Analytics">Upload Product</div>
               </NavLink>
             </li>
-            <li className="menu-item ">
+            {/* <li className="menu-item ">
               <NavLink to="/clientorder" className="menu-link ">
                 <i className="menu-icon tf-icons bx bxl-product-hunt"></i>
                 <div data-i18n="Analytics">Client Order</div>
+              </NavLink>
+            </li> */}
+            <li className="menu-item ">
+              <NavLink to="/upload-blog" className="menu-link ">
+                <i className="menu-icon tf-icons bx bxl-blogger"></i>
+                <div data-i18n="Analytics">Upload Blog</div>
               </NavLink>
             </li>
 

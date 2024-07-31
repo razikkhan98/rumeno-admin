@@ -266,7 +266,7 @@ const Home = () => {
                     </div>
                   </div>
                 </div>
-                <Table/>
+                {/* <Table/> */}
               </div>
 
               {/* <!-- / Content --> */}

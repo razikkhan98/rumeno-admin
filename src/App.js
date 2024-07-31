@@ -12,6 +12,7 @@ import Test from './Component/Common/SuperAdmin/superadminlogin';
 import Testlang from './Component/Common/Mean/test';
 import Demo from './Component/Common/Mean/test';
 import ClntOrdTbl from './Component/Common/Table/clientorder';
+import BlogUpload from './Component/Common/AdminBlogUpload';
 
 function App() {
   return (
@@ -28,7 +29,8 @@ function App() {
        <Routes>
          <Route path="/" element={<Home />} />
          <Route path="uploadproduct" element={<AdminCartUpload />} />
-         <Route path="clientorder" element={<ClntOrdTbl />} />
+         {/* <Route path="clientorder" element={<ClntOrdTbl />} /> */}
+         <Route path="upload-blog" element={<BlogUpload />} />
        </Routes>
        </BrowserRouter>
 
