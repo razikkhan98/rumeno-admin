@@ -17,7 +17,6 @@ const AdminCartUpload = () => {
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, reset, setValue, control } = useForm();
   const apiUrl = `${process.env.REACT_APP_API}`;
-  const apiKey = "273ab24b40be59dc593d96c50976ae42";
 
   const openBlogModal = () => {
     reset();
@@ -75,7 +74,7 @@ const AdminCartUpload = () => {
 
       try {
         const uploadImgResponse = await axios.post(
-          `https://api.imgbb.com/1/upload?key=${apiKey}`,
+          `https://api.imgbb.com/1/upload?key=${process.env.REACT_APP_API_IMAGE}`,
           formData
         );
         return uploadImgResponse.data.data.url;
@@ -174,7 +173,7 @@ const AdminCartUpload = () => {
               <button onClick={openBlogModal} className="btn btn-primary">Add Blog</button>
               <div className="row mt-4 justify-content-center w-100">
                 {blogs.map((blog, index) => (
-                  <div key={index} className="col-lg-3 mx-4 card mb-3 px-0">
+                  <div key={index} className="col-lg-3 mx-4 card blog-card mb-3 px-0">
                     {(!blog?.image?.length) ? <img src={dummy} className="img-fluid" alt="loading" /> : <img src={blog?.image} className="img-fluid object-fit-cover h-50" alt="loading" />}
                     <div className='py-3 px-2'>
                       <div className='text-trun-blog' dangerouslySetInnerHTML={{ __html: blog.content }} />

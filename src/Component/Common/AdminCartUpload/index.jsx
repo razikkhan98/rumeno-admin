@@ -22,19 +22,20 @@ const AdminCartUpload = () => {
 
 
   const handleFileChange = (e) => {
-    if (e.target.files.length === 0) {
-      console.warn("No file selected");
-      return; // Exit the function early if no file is selected
+    try {
+      const files = Array.from(e?.target?.files);
+      console.log('e?.target?.files: ', e?.target?.files);
+      setSelectedFile(files);
+
+      const reader = new FileReader();
+      reader.readAsDataURL(files[0]);
+      reader.onload = () => {
+        setImageUrl(reader?.result);
+      };
+      console.log('ImageUrl: ', imageUrl);
+
     }
-  
-    const files = Array.from(e.target.files);
-    setSelectedFile(files[0]);
-  
-    const reader = new FileReader();
-    reader.readAsDataURL(files[0]);
-    reader.onload = () => {
-      setImageUrl(reader.result);
-    };
+    catch (error) { console.log(error) }
   };
   
 
@@ -94,6 +95,7 @@ const AdminCartUpload = () => {
 
 
   const onsubmit = async (data) => {
+    console.log('data: ', data);
     setLoading(true)
 
     const apiKey = "273ab24b40be59dc593d96c50976ae42";
@@ -101,6 +103,7 @@ const AdminCartUpload = () => {
     for (let i = 0; i < selectedFile?.length; i++) {
       const formData = new FormData();
       formData.append("image", selectedFile[i]);
+      console.log('formData: ', formData);
 
       console.log(`Uploading image ${i + 1} of ${selectedFile?.length}`);
 
@@ -115,6 +118,7 @@ const AdminCartUpload = () => {
           console.log(`Image ${i + 1} uploaded successfully`, uploadImgResponse?.data?.data?.url);
           const imageUrl = uploadImgResponse?.data?.data?.url;
         uploadedUrls.push(imageUrl); // Store URL in the array
+        console.log('uploadedUrls: ', uploadedUrls);
         } else {
           console.log(`Image ${i + 1} failed to upload: ${uploadImgResponse?.data?.error?.message}`);
           break;  // Optionally, break the loop if any upload fails
@@ -270,7 +274,7 @@ const AdminCartUpload = () => {
                     <div className="card prd-card col-lg-5 m-2 bg-white" key={product.index}>
                       <div className="row g-0 py-3">
                         <div className="col-md-4 d-flex">
-                          {(!product?.img?.length) ? <img src={dummy} className="img-fluid" alt="loading" /> : <img src={product.img[0]} className="img-fluid" alt="loading" />}
+                          {(!product?.img?.length) ? <img src={dummy} className="img-fluid" alt="loading" /> : <img src={product?.img[0]} className="img-fluid" alt="loading" />}
                         </div>
                         <div className="col-md-8">
                           <div className="card-body">
@@ -617,7 +621,7 @@ const AdminCartUpload = () => {
                           </label>
                           <textarea rows={3}
                             name="script"
-                            placeholder="img text"
+                            placeholder="script"
                             type="text"
                             id="script"
                             className="form-control"
@@ -645,7 +649,7 @@ const AdminCartUpload = () => {
                           </label>
                           <textarea rows={3}
                             name="offer"
-                            placeholder="img text"
+                            placeholder="offer"
                             type="text"
                             id="offer"
                             className="form-control"
@@ -726,7 +730,7 @@ const AdminCartUpload = () => {
                           <label htmlFor="file-input" className="file-upload-label">
                             <div className="file-upload-box">
                               {imageUrl?.length ? (
-                                  <img src={imageUrl[0]} className="file-icon w-100 h-100" />
+                                  <img src={imageUrl} className="file-icon w-100 h-100" />
                               ) : (
                                 <div className="file-icon">&#128190;</div>
                               )}

@@ -4,6 +4,13 @@
 .modal-dialog,.modal-size{
     max-width: 90% !important;
 }
-.card{
+.blog-card{
     height: 29rem;
+}
+.transaction{
+    overflow: auto !important;
+} 
+
+.bg-smoke{
+    background-color: whitesmoke !important;
 }
