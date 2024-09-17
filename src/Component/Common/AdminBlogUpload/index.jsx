@@ -7,6 +7,8 @@ import Mean from "../Mean";
 import Navbar from "../Navbar";
 import axios from 'axios';
 import dummy from '../../assets/img/products/istockphoto-1409329028-612x612.jpg';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faImage } from '@fortawesome/free-solid-svg-icons';
 
 const AdminCartUpload = () => {
   const [blogs, setBlogs] = useState([]);
@@ -15,7 +17,7 @@ const AdminCartUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, reset, setValue, control } = useForm();
+  const { register, handleSubmit, reset, setValue, control,formState: { errors } } = useForm();
   const apiUrl = `${process.env.REACT_APP_API}`;
 
   const openBlogModal = () => {
@@ -27,7 +29,7 @@ const AdminCartUpload = () => {
     setValue("heading", "");
     setValue("description", "");
     setImageUrl(null);
-    localStorage.removeItem('selectedBlog');
+    setSelectedFile(null);
     localStorage.removeItem('storeBlogUrl');
   };
 
@@ -35,7 +37,7 @@ const AdminCartUpload = () => {
     setOpenModal(false);
     setSelectedItem(null);
     setImageUrl(null);
-    localStorage.removeItem('selectedBlog');
+    setSelectedFile(null);
     localStorage.removeItem('storeBlogUrl');
   };
 
@@ -45,23 +47,23 @@ const AdminCartUpload = () => {
 
   const handleFileChange = (e) => {
     try {
-      const files = Array.from(e?.target?.files);
+      const files = Array.from(e.target.files);
       setSelectedFile(files[0]);
 
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
       reader.onload = () => {
-        setImageUrl(reader?.result);
+        setImageUrl(reader.result);
       };
+    } catch (error) {
+      console.log(error);
     }
-    catch (error) { console.log(error) }
   };
 
   const fetchItems = async () => {
     try {
       const response = await axios.get(`${apiUrl}/get_all_blog`);
       setBlogs(response.data.blog);
-      console.log('response.data.blog: ', response.data.blog);
     } catch (error) {
       console.error('Error fetching items:', error);
     }
@@ -136,8 +138,9 @@ const AdminCartUpload = () => {
     setValue("heading", blogs[index].heading);
     setValue("description", blogs[index].description);
     setImageUrl(blogs[index].image);
+    setSelectedFile(null); // Clear the selected file when editing
     setSelectedItem(index);
-    localStorage.setItem('selectedBlog', index);
+    localStorage.setItem('storeBlogUrl', blogs[index].image); // Set the image URL in localStorage
   };
 
   const handleDelete = async (index) => {
@@ -162,6 +165,7 @@ const AdminCartUpload = () => {
     },
   };
 
+
   return (
     <section className="bg-menu-theme">
       <div className="layout-wrapper layout-content-navbar">
@@ -174,9 +178,11 @@ const AdminCartUpload = () => {
               <div className="row mt-4 justify-content-center w-100">
                 {blogs.map((blog, index) => (
                   <div key={index} className="col-lg-3 mx-4 card blog-card mb-3 px-0">
-                    {(!blog?.image?.length) ? <img src={dummy} className="img-fluid" alt="loading" /> : <img src={blog?.image} className="img-fluid object-fit-cover h-50" alt="loading" />}
+                    {(!blog?.image?.length) ? <img src={dummy} className="img-fluid" alt="loading" /> : <img src={blog?.image} className="img-fluid object-fit-cover" alt="loading" />}
                     <div className='py-3 px-2'>
-                      <div className='text-trun-blog' dangerouslySetInnerHTML={{ __html: blog.content }} />
+                      <h4 className='text-trun-blog' > {blog.heading}</h4>
+                      <p className='text-trun-blog-desc' > {blog.description}</p>
+                      {/* <div className='text-trun-blog' dangerouslySetInnerHTML={{ __html: blog.content }} /> */}
                       <hr className='my-2 text-secondary' />
                       <div className='d-flex mt-3 justify-content-around'>
                         <button onClick={() => handleEdit(index)} className="btn btn-warning mx-1">Edit</button>
@@ -218,8 +224,13 @@ const AdminCartUpload = () => {
                           type="text"
                           id="heading"
                           className="form-control"
-                          {...register("heading")}
+                          {...register("heading",{ required: "heading required" })}
                         />
+                        {errors.heading && (
+                          <p className="text-danger">
+                            {errors.heading.message}
+                          </p>
+                        )}
                       </div>
                       <div className="col-lg-5 my-2">
                         <label className="form-label" htmlFor="description">
@@ -231,8 +242,49 @@ const AdminCartUpload = () => {
                           type="text"
                           id="description"
                           className="form-control"
-                          {...register("description")}
-                        />
+                          {...register("description",{ required: "description required" })}
+                          />
+                          {errors.description && (
+                            <p className="text-danger">
+                              {errors.description.message}
+                            </p>
+                          )}
+                      </div>
+                      <div className="col-lg-5 my-2">
+                        <label className="form-label" htmlFor="metadescription">
+                         Meta Description
+                        </label>
+                        <textarea rows={3}
+                          name="metadescription"
+                          placeholder="Meta Description"
+                          type="text"
+                          id="metadescription"
+                          className="form-control"
+                          {...register("metadescription",{ required: "meta description required" })}
+                          />
+                          {errors.metadescription && (
+                            <p className="text-danger">
+                              {errors.metadescription.message}
+                            </p>
+                          )}
+                      </div>
+                      <div className="col-lg-5 my-2">
+                        <label className="form-label" htmlFor="script">
+                         Script
+                        </label>
+                        <textarea rows={3}
+                          name="script"
+                          placeholder="script"
+                          type="text"
+                          id="script"
+                          className="form-control"
+                          {...register("script",{ required: "script required" })}
+                          />
+                          {errors.script && (
+                            <p className="text-danger">
+                              {errors.script.message}
+                            </p>
+                          )}
                       </div>
 
                       <div className="col-lg-5 my-2">
@@ -245,29 +297,36 @@ const AdminCartUpload = () => {
                           type="text"
                           id="keywords"
                           className="form-control"
-                          {...register("keywords")}
-                        />
+                          {...register("keywords",{ required: "keywords required" })}
+                          />
+                          {errors.keywords && (
+                            <p className="text-danger">
+                              {errors.keywords.message}
+                            </p>
+                          )}
                       </div>
                       <div className="file-upload-container col-lg-5">
-                        <label htmlFor="file-input" className="file-upload-label fw-bold mx-3">
-                          Upload Blog Image
-                          <div className="file-upload-box mx-3">
+                      <p className="text-start form-label">upload product images</p>
+                        <label htmlFor="file-input" className="file-upload-label  border">
+                          <div className="file-upload-box mx-3 text-center">
                             {imageUrl?.length ? (
-                              <img src={imageUrl} className="file-icon w-100 h-100" />
+                              <img src={imageUrl} className="file-icon modal-main-img shadow" />
                             ) : (
-                              <div className="file-icon">&#128190;</div>
+                              <div className="file-icon px-4 py-3"><FontAwesomeIcon className="h1" icon={faImage} />
+                                <p  className="m-0">uplaod image</p>
+                                </div>
                             )}
                             {selectedFile?.length > 0 ? (
                               <div className="file-name">{selectedFile.map(file => file.name).join(', ')}</div>
                             ) : (
-                              <div className="file-placeholder">Upload Product Images</div>
+                              <div className="file-placeholder"></div>
                             )}
                           </div>
+                          
                         </label>
                         <input
                           type="file"
                           id="file-input"
-                          multiple
                           onChange={handleFileChange}
                           style={{ display: "none" }}
                         />

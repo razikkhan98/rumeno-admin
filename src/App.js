@@ -10,24 +10,14 @@ function App() {
   return (
     
     <div className="App">
-
-      {/* <Home/> */}
-      {/* <BarChartNo/> */}
-      {/* <AdminRegister/> */}
-      {/* <Adminlogin/> */}
-      {/* <TransImgUpload/> */}
-      {/* <AdminCartUpload/> */}
       <BrowserRouter>
        <Routes>
          <Route path="/" element={<Home />} />
          <Route path="uploadproduct" element={<AdminCartUpload />} />
-         {/* <Route path="clientorder" element={<ClntOrdTbl />} /> */}
          <Route path="upload-blog" element={<BlogUpload />} />
          <Route path="transaction-details" element={<TransactionDetails />} />
        </Routes>
        </BrowserRouter>
-
-      {/* <Demo/> */}
     </div>
       
   );

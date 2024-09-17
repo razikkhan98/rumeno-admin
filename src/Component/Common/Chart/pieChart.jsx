@@ -1,14 +1,14 @@
 import React from "react";
 import { PieChart, Pie,Tooltip } from 'recharts';
 
-const PieChartNo = () => {
+const PieChartNo = ({pieData}) => {
     const data   = [
-        { name: 'July', value: 400 },
-        { name: 'August', value: 300 },
-        { name: 'September', value: 300 },
-        { name: 'October', value: 200 },
-        { name: 'November', value: 278 },
-        { name: 'December', value: 189 },
+        { value: 400 },
+        { value: 300 },
+        { value: 300 },
+        { value: 200 },
+        { value: 278 },
+        { value: 189 },
       ];
     return(
         <>

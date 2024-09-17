@@ -8,104 +8,127 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Modal } from "react-bootstrap";
 import dummy from '../../assets/img/products/istockphoto-1409329028-612x612.jpg'
+import { faImage, faRemove, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ImageUpload from "../upload/imageUpload";
 
 const AdminCartUpload = () => {
-
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm();
   const [ProductData, setProductData] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState();
+  const [selectedItem, setSelectedItem] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState();
+  const [imageUrl, setImageUrl] = useState(null);
   const apiUrl = `${process.env.REACT_APP_API}`;
+  const [loading, setLoading] = useState(false);
+  const [UploadLoading, setUploadLoading] = useState(false);
+  const [fileList, setFileList] = useState([]);
 
-
-
-  const handleFileChange = (e) => {
-    try {
-      const files = Array.from(e?.target?.files);
-      console.log('e?.target?.files: ', e?.target?.files);
-      setSelectedFile(files);
-
-      const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
-      reader.onload = () => {
-        setImageUrl(reader?.result);
-      };
-      console.log('ImageUrl: ', imageUrl);
-
-    }
-    catch (error) { console.log(error) }
-  };
-  
-
-
-
-
-  const handleOpenDialog = () => {
-    localStorage.removeItem('localSelectItem')
-    localStorage.removeItem('storeUrl')
-    setOpenModal(true);
-    setValue("name","")
-      setValue("price","")
-      setValue("img","")
-      setValue("metaDesc","")
-      setValue("veg","")
-      setValue("offer","")
-      setValue("delivery","")
-      setValue("refundable","")
-      setValue("weight","")
-      setValue("shortdescription","")
-      setValue("description","")
-      setValue("instruction","")
-      setValue("category","")
-      setValue("type","")
-      setValue("imgtext","")
-      setValue("script","")
-      setValue("video","")
-      setImageUrl(null)
-    setSelectedItem(null);
-  };
 
 
   useEffect(() => {
     fetchItems();
+    // console.log("cekc",UploadImg)
   }, []);
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/get_all_product`
-        // ,
-        // {
-        //   headers: {
-        //     // 'Authorization': `${getMidCookies.token}`
-        //   }
-        // }
-      );
-      setProductData(response?.data?.products)
+      const response = await axios.get(`${apiUrl}/get_all_product`);
+      setProductData(response?.data?.products);
+      console.log('response?.data?.products: ', response?.data?.products);
     } catch (error) {
       console.error('Error fetching items:', error);
     }
   };
 
-  // ------------
-  const [loading, setLoading] = useState(false);
-  // -------------
+  const handleFileChange = (e) => {
+    try {
+      const files = Array.from(e.target.files);
+      setSelectedFile(files);
+      // let element = []
+      // for (let index = 0; index < files?.length; index++) {
+      //   element.push(URL.createObjectURL(files[index]));
+      // }
+      // localStorage.setItem("multiImg", JSON.stringify(element))
+      // setFileList(JSON.parse(localStorage.getItem("multiImg")));
+      const reader = new FileReader();
+      reader.readAsDataURL(files[0]);
+      reader.onload = () => {
+        setImageUrl(reader.result);
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
 
 
-  const onsubmit = async (data) => {
-    console.log('data: ', data);
-    setLoading(true)
+  const handleOpenDialog = () => {
+    reset();
+    setOpenModal(true);
+    setSelectedItem(null);
+    localStorage.removeItem('localSelectItem');
+    localStorage.removeItem('storeUrl');
+    setValue("name", "");
+    setValue("price", "");
+    setValue("img", "");
+    setValue("metaDesc", "");
+    setValue("veg", "");
+    setValue("offer", "");
+    setValue("delivery", "");
+    setValue("refundable", "");
+    setValue("weight", "");
+    setValue("shortdescription", "");
+    setValue("description", "");
+    setValue("instruction", "");
+    setValue("category", "");
+    setValue("type", "");
+    setValue("imgtext", "");
+    setValue("script", "");
+    setValue("video", "");
+    setImageUrl(null);
+    setSelectedFile(null);
+    setUploadedUrls([])
+    setFileList(null)
+  };
 
-    const apiKey = "273ab24b40be59dc593d96c50976ae42";
+  const handleCloseDialog = () => {
+    localStorage.removeItem('localSelectItem');
+    localStorage.removeItem('storeUrl');
+    setOpenModal(false);
+    setValue("name", "");
+    setValue("price", "");
+    setValue("img", "");
+    setValue("metaDesc", "");
+    setValue("veg", "");
+    setValue("offer", "");
+    setValue("delivery", "");
+    setValue("refundable", "");
+    setValue("weight", "");
+    setValue("shortdescription", "");
+    setValue("description", "");
+    setValue("instruction", "");
+    setValue("category", "");
+    setValue("type", "");
+    setValue("imgtext", "");
+    setValue("script", "");
+    setValue("video", "");
+    setImageUrl(null);
+    setSelectedFile(null);
+    setSelectedItem(null);
+    setUploadedUrls([])
+    setFileList(null)
+  };
+  // ------------------------
+  const [uploadedUrls, setUploadedUrls] = useState([]); // Store the actual URLs from the API
+  const apiKey = "273ab24b40be59dc593d96c50976ae42"; // Replace with your actual API key
+
+  const uploadImagesToApi = async (files) => {
     const uploadedUrls = [];
-    for (let i = 0; i < selectedFile?.length; i++) {
-      const formData = new FormData();
-      formData.append("image", selectedFile[i]);
-      console.log('formData: ', formData);
 
-      console.log(`Uploading image ${i + 1} of ${selectedFile?.length}`);
+    for (let i = 0; i < files.length; i++) {
+      const formData = new FormData();
+      formData.append("image", files[i]);
 
       try {
         const uploadImgResponse = await axios.post(
@@ -113,144 +136,165 @@ const AdminCartUpload = () => {
           formData
         );
 
-        console.log('response: ', uploadImgResponse?.data?.status);
-        if (uploadImgResponse?.data?.status === 200) {
-          console.log(`Image ${i + 1} uploaded successfully`, uploadImgResponse?.data?.data?.url);
-          const imageUrl = uploadImgResponse?.data?.data?.url;
-        uploadedUrls.push(imageUrl); // Store URL in the array
-        console.log('uploadedUrls: ', uploadedUrls);
+        if (uploadImgResponse.data.status === 200) {
+          const imageUrl = uploadImgResponse.data.data.url;
+          uploadedUrls.push(imageUrl);
         } else {
-          console.log(`Image ${i + 1} failed to upload: ${uploadImgResponse?.data?.error?.message}`);
-          break;  // Optionally, break the loop if any upload fails
+          console.log(`Image ${i + 1} failed to upload: ${uploadImgResponse.data.error.message}`);
         }
       } catch (error) {
         console.log(`Error uploading image ${i + 1}: `, error);
-        break;  // Optionally, break the loop if any upload fails
       }
-      localStorage.setItem('storeUrl', uploadedUrls);
     }
+
+    return uploadedUrls;
+  };
+
+  const handleImgUpload = async (e) => {
+    setUploadLoading(true);
+    const files = Array.from(e.target.files);
+    
+    try {
+      const newUploadedUrls = await uploadImagesToApi(files);
+      if (newUploadedUrls) {
+        setUploadLoading(false);
+      }
+  
+      // Get previously uploaded URLs or initialize an empty array if none exist
+      let getPrevUrl = JSON.parse(localStorage.getItem('storeUrl')) || [];
+  
+      // Merge the old and new URLs
+      let merge = [...getPrevUrl, ...newUploadedUrls];
+      setUploadedUrls((prevUrls) => prevUrls.concat(newUploadedUrls));
+  
+      // Store the updated URLs in localStorage
+      localStorage.setItem('storeUrl', JSON.stringify(merge));
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      setUploadLoading(false);
+    }
+  };
+  
+
+  const handleImgRemove = (index) => {
+    const newUploadedUrls = uploadedUrls.filter((_, i) => i !== index);
+    setUploadedUrls(newUploadedUrls);
+    localStorage.setItem('storeUrl', JSON.stringify(newUploadedUrls));
+  };
+
+  const handleImgUpdate = async (e, index) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUploadLoading(true);
+
+      const newUploadedUrls = await uploadImagesToApi([file]);
+
+      if (newUploadedUrls.length > 0) {
+
+        if (newUploadedUrls) {
+          setUploadLoading(false);
+        }
+        const updatedUrls = uploadedUrls?.map((img, i) =>
+          i === index ? newUploadedUrls[0] : img
+        );
+        setUploadedUrls(updatedUrls);
+        console.log('updatedUrls: ', updatedUrls);
+        localStorage.setItem('storeUrl', JSON.stringify(updatedUrls));
+      }
+    }
+  };
+  // ---------------
+
+
+
+  const onsubmit = async (data) => {
+    console.log('data: ', data);
+    setLoading(true);
+    let uploadedUrls = [];
+
+    // if (selectedFile) {
+    //   uploadedUrls = await uploadImages();
+    // } else if (!selectedItem) {
+    uploadedUrls = JSON.parse(localStorage.getItem('storeUrl'));
+    // }
+
     const payload = {
-      name: data?.name,
-      priceText: data?.price,
-      img: localStorage.getItem('storeUrl'),
-      metaDesc: data?.metaDesc,
-      Veg: data?.veg,
-      Offer: data?.offer,
-      Delivery: data?.delivery,
-      Refundable: data?.refundable,
-      Weight: data?.weight,
-      Shortdescription: data?.shortdescription,
-      description: data?.description,
-      Instruction: data?.instruction,
-      Category: data?.category,
-      Type: data?.type,
-      imgText: data?.imgtext,
-      script: data?.script,
-      video: data?.video,
-    }
-    // Uncomment and update the below code for editing or adding items if necessary
-    if (localStorage.getItem('localSelectItem')) {
-      try {
-        const response = await axios.put(`${apiUrl}/update_product/${ProductData[localStorage.getItem('localSelectItem')]._id}`, payload
-          //   ,
-          //    {
-          //   headers: {
-          //     'Authorization': `${getMidCookies.token}`
-          //   }
-          // }
-        );
-        const updatedAdminProduct = [...ProductData];
-        updatedAdminProduct[selectedItem] = response.data;
+      name: data.name,
+      priceText: data.price,
+      img: uploadedUrls,
+      metaDesc: data.metaDesc,
+      Veg: data.veg,
+      Offer: data.offer,
+      Delivery: data.delivery,
+      Refundable: data.refundable,
+      Weight: data.weight,
+      Shortdescription: data.shortdescription,
+      description: data.description,
+      Instruction: data.instruction,
+      Category: data.category,
+      Type: data.type,
+      imgText: data.imgtext,
+      script: data.script,
+      video: data.video,
+    };
+
+    try {
+      if (selectedItem !== null) {
+        const response = await axios.put(`${apiUrl}/update_product/${ProductData[selectedItem]._id}`, payload);
+        const updatedProductData = [...ProductData];
+        updatedProductData[selectedItem] = response.data;
+        setProductData(updatedProductData);
         fetchItems();
-      } catch (error) {
-        console.error("Error updating item:", error);
-      }
-    } else {
-      try {
-        const response = await axios.post(`${apiUrl}/create_product`, payload
-          //   , {
-          //   headers: {
-          //     'Authorization': `${getMidCookies.token}`
-          //   }
-          // }
-        );
+      } else {
+        const response = await axios.post(`${apiUrl}/create_product`, payload);
+        console.log('response: ', response);
         fetchItems();
-      } catch (error) {
-        console.error("Error adding item:", error);
       }
+    } catch (error) {
+      console.error('Error saving item:', error);
     }
-    setLoading(false)
+
+    setLoading(false);
     handleCloseDialog();
   };
 
   const handleEdit = (index) => {
     setSelectedItem(index);
-    localStorage.setItem('localSelectItem', index)
-    setValue("name", ProductData[index].name);
-    setValue("price", ProductData[index].priceText);
-    setValue("img", setImageUrl(ProductData[index].img));
-    setValue("metaDesc", ProductData[index].metaDesc);
-    setValue("veg", ProductData[index].Veg);
-    setValue("offer", ProductData[index].Offer);
-    setValue("delivery", ProductData[index].Delivery);
-    setValue("refundable", ProductData[index].Refundable);
-    setValue("weight", ProductData[index].Weight);
-    setValue("shortdescription", ProductData[index].Shortdescription);
-    setValue("description", ProductData[index].description);
-    setValue("instruction", ProductData[index].Instruction);
-    setValue("category", ProductData[index].Category);
-    setValue("type", ProductData[index].Type);
-    setValue("imgtext", ProductData[index].imgText);
-    setValue("script", ProductData[index].script);
-    setValue("video", ProductData[index].video);
-    
+    const product = ProductData[index];
+
+    localStorage.setItem('localSelectItem', index);
+    localStorage.setItem('storeUrl', JSON.stringify(product.img));
+
+    setValue("name", product?.name);
+    setValue("price", product?.priceText);
+    setValue("metaDesc", product?.metaDesc);
+    setValue("veg", product?.Veg);
+    setValue("offer", product?.Offer);
+    setValue("delivery", product?.Delivery);
+    setValue("refundable", product?.Refundable);
+    setValue("weight", product?.Weight);
+    setValue("shortdescription", product?.Shortdescription);
+    setValue("description", product?.description);
+    setValue("instruction", product?.Instruction);
+    setValue("category", product?.Category);
+    setValue("type", product?.Type);
+    setValue("imgtext", product?.imgText);
+    setValue("script", product?.script);
+    setValue("video", product?.video);
+    setImageUrl(product?.img?.length > 0 ? product?.img[0] : null);
+    setFileList(product?.img?.length > 0 ? product?.img : null)
+    setUploadedUrls(product?.img?.length > 0 ? product?.img : [])
     setOpenModal(true);
   };
 
-
-  const handleCloseDialog = () => {
-    localStorage.removeItem('localSelectItem')
-    localStorage.removeItem('storeUrl')
-    setOpenModal(false);
-    setValue("name","")
-      setValue("price","")
-      setValue("img","")
-      setValue("metaDesc","")
-      setValue("veg","")
-      setValue("offer","")
-      setValue("delivery","")
-      setValue("refundable","")
-      setValue("weight","")
-      setValue("shortdescription","")
-      setValue("description","")
-      setValue("instruction","")
-      setValue("category","")
-      setValue("type","")
-      setValue("imgtext","")
-      setValue("script","")
-      setValue("video","")
-      setImageUrl(null)
-    setSelectedItem(null);
-  };
-
-
   const handleDelete = async (index) => {
-
     try {
-      const response = await axios.delete(`${apiUrl}/delete_product/${ProductData[index]._id}`
-      // ,
-      //   {
-      //     headers: {
-      //       'Authorization': `${getMidCookies.token}`
-      //     }
-      //   }
-      );
+      await axios.delete(`${apiUrl}/delete_product/${ProductData[index]._id}`);
       setProductData(ProductData.filter((_, i) => i !== index));
     } catch (error) {
       console.error('Error deleting item:', error);
     }
   };
-
 
 
   return (
@@ -274,7 +318,7 @@ const AdminCartUpload = () => {
                     <div className="card prd-card col-lg-5 m-2 bg-white" key={product.index}>
                       <div className="row g-0 py-3">
                         <div className="col-md-4 d-flex">
-                          {(!product?.img?.length) ? <img src={dummy} className="img-fluid" alt="loading" /> : <img src={product?.img[0]} className="img-fluid" alt="loading" />}
+                          {(!product?.img?.length) ? <img src={dummy} className="img-fluid" alt="loading" /> : <img src={product?.img[0]} className="prd-img" alt="loading" />}
                         </div>
                         <div className="col-md-8">
                           <div className="card-body">
@@ -337,8 +381,11 @@ const AdminCartUpload = () => {
                             id="name"
                             className="form-control"
                             value={ProductData.name}
-                            {...register("name")}
+                            {...register("name", { required: "Product Name is required" })}
                           />
+                          {errors.name && (
+                            <p className=" text-danger">{errors.name.message}</p>
+                          )}
                         </div>
 
                         <div className="col-lg-3 my-2">
@@ -352,8 +399,11 @@ const AdminCartUpload = () => {
                             id="price"
                             className="form-control"
                             value={ProductData.price}
-                            {...register("price")}
+                            {...register("price", { required: "price is required" })}
                           />
+                          {errors?.price && (
+                            <p className="text-danger">{errors.price.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-3 my-2">
                           <label className="form-label" for="weight">
@@ -366,8 +416,11 @@ const AdminCartUpload = () => {
                             id="weight"
                             className="form-control"
                             value={ProductData.weight}
-                            {...register("weight")}
+                            {...register("weight", { required: "weight is required" })}
                           />
+                          {errors?.weight && (
+                            <p className="text-danger">{errors.weight.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-6 my-2">
                           <label className="form-label" for="description">
@@ -380,8 +433,11 @@ const AdminCartUpload = () => {
                             id="description"
                             className="form-control"
                             value={ProductData.description}
-                            {...register("description")}
+                            {...register("description", { required: "description is required" })}
                           />
+                          {errors?.description && (
+                            <p className="text-danger">{errors.description.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-6 my-2">
                           <label className="form-label" for="shortdescription">
@@ -394,8 +450,11 @@ const AdminCartUpload = () => {
                             id="shortdescription"
                             className="form-control"
                             value={ProductData.shortdescription}
-                            {...register("shortdescription")}
+                            {...register("shortdescription", { required: "shortdescription is required" })}
                           />
+                          {errors?.shortdescription && (
+                            <p className="text-danger">{errors.shortdescription.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-6 my-2">
                           <label className="form-label" for="instruction">
@@ -408,8 +467,11 @@ const AdminCartUpload = () => {
                             id="instruction"
                             className="form-control"
                             value={ProductData.instruction}
-                            {...register("instruction")}
+                            {...register("instruction", { required: "instruction is required" })}
                           />
+                          {errors.instruction && (
+                            <p className="text-danger">{errors.instruction.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-6 my-2">
                           <label className="form-label" for="type">
@@ -422,8 +484,11 @@ const AdminCartUpload = () => {
                             id="type"
                             className="form-control"
                             value={ProductData.type}
-                            {...register("type")}
+                            {...register("type", { required: "type is required" })}
                           />
+                          {errors.type && (
+                            <p className="text-danger">{errors.type.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-12 my-2">
                           <label
@@ -439,7 +504,7 @@ const AdminCartUpload = () => {
                               <input
                                 class="form-check-input"
                                 type="checkbox"
-                                value="cat "
+                                value="cat"
                                 id="flexCheckDefault1"
                                 {...register("category")}
                               />
@@ -452,7 +517,7 @@ const AdminCartUpload = () => {
                               <input
                                 class="form-check-input"
                                 type="checkbox"
-                                value="dog "
+                                value="dog"
                                 id="flexCheckDefault2"
                                 {...register("category")}
                               />
@@ -465,7 +530,7 @@ const AdminCartUpload = () => {
                               <input
                                 class="form-check-input"
                                 type="checkbox"
-                                value="goat "
+                                value="goat"
                                 id="flexCheckDefault3"
                                 {...register("category")}
                               />
@@ -478,7 +543,7 @@ const AdminCartUpload = () => {
                               <input
                                 class="form-check-input"
                                 type="checkbox"
-                                value="sheep "
+                                value="sheep"
                                 id="flexCheckDefault4"
                                 {...register("category")}
                               />
@@ -491,12 +556,12 @@ const AdminCartUpload = () => {
                               <input
                                 class="form-check-input"
                                 type="checkbox"
-                                value="cow "
+                                value="fish"
                                 id="flexCheckDefault5"
                                 {...register("category")}
                               />
                               <label class="form-check-label" for="flexCheckDefault5">
-                                cow
+                                fish
                               </label>
                             </div>
                             <div class="form-check">
@@ -504,7 +569,7 @@ const AdminCartUpload = () => {
                               <input
                                 class="form-check-input"
                                 type="checkbox"
-                                value="baffalo "
+                                value="baffalo"
                                 id="flexCheckDefault6"
                                 {...register("category")}
                               />
@@ -521,7 +586,7 @@ const AdminCartUpload = () => {
                               <input
                                 class="form-check-input"
                                 type="checkbox"
-                                value="horse "
+                                value="horse"
                                 id="flexCheckDefault7"
                                 {...register("category")}
                               />
@@ -534,7 +599,7 @@ const AdminCartUpload = () => {
                               <input
                                 class="form-check-input"
                                 type="checkbox"
-                                value="pig "
+                                value="pig"
                                 id="flexCheckDefault8"
                                 {...register("category")}
                               />
@@ -547,7 +612,7 @@ const AdminCartUpload = () => {
                               <input
                                 class="form-check-input"
                                 type="checkbox"
-                                value="birds "
+                                value="birds"
                                 id="flexCheckDefault9"
                                 {...register("category")}
                               />
@@ -560,7 +625,7 @@ const AdminCartUpload = () => {
                               <input
                                 class="form-check-input"
                                 type="checkbox"
-                                value="poultry "
+                                value="poultry"
                                 id="flexCheckDefault10"
                                 {...register("category")}
                               />
@@ -573,7 +638,7 @@ const AdminCartUpload = () => {
                               <input
                                 class="form-check-input"
                                 type="checkbox"
-                                value="cattle "
+                                value="cattle"
                                 id="flexCheckDefault11"
                                 {...register("category")}
                               />
@@ -588,18 +653,21 @@ const AdminCartUpload = () => {
 
                         <div className="col-lg-4 my-2">
                           <label className="form-label" for="imgtext">
-                            Image Text
+                            Image Alt Text
                           </label>
                           <textarea
                             name="imgtext"
-                            placeholder="img text"
+                            placeholder="img alt text"
                             type="text"
                             id="imgtext"
                             className="form-control"
                             rows={3}
                             value={ProductData.imgtext}
-                            {...register("imgtext")}
+                            {...register("imgtext", { required: "imgtext is required" })}
                           />
+                          {errors.imgtext && (
+                            <p className="text-danger">{errors.imgtext.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-4 my-2">
                           <label className="form-label" for="refundable">
@@ -612,8 +680,11 @@ const AdminCartUpload = () => {
                             id="refundable"
                             className="form-control"
                             value={ProductData.refundable}
-                            {...register("refundable")}
+                            {...register("refundable", { required: "refundable is required" })}
                           />
+                          {errors.refundable && (
+                            <p className="text-danger">{errors.refundable.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-4 my-2">
                           <label className="form-label" for="script">
@@ -626,8 +697,11 @@ const AdminCartUpload = () => {
                             id="script"
                             className="form-control"
                             value={ProductData.script}
-                            {...register("script")}
+                            {...register("script", { required: "script is required" })}
                           />
+                          {errors.script && (
+                            <p className="text-danger">{errors.script.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-4 my-2">
                           <label className="form-label" for="delivery">
@@ -640,8 +714,11 @@ const AdminCartUpload = () => {
                             id="delivery"
                             className="form-control"
                             value={ProductData.delivery}
-                            {...register("delivery")}
+                            {...register("delivery", { required: "delivery is required" })}
                           />
+                          {errors.delivery && (
+                            <p className="text-danger">{errors.delivery.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-4 my-2">
                           <label className="form-label" for="offer">
@@ -654,16 +731,19 @@ const AdminCartUpload = () => {
                             id="offer"
                             className="form-control"
                             value={ProductData.offer}
-                            {...register("offer")}
+                            {...register("offer", { required: "offer is required" })}
                           />
+                          {errors.offer && (
+                            <p className="text-danger">{errors.offer.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-4 my-2">
                           <label className="form-label" for="video">
-                            Videos
+                            Videos Link
                           </label>
                           <textarea rows={3}
                             name="video"
-                            placeholder="upload video"
+                            placeholder="upload youtube iframe video url"
                             type="text"
                             id="video"
                             className="form-control"
@@ -682,8 +762,11 @@ const AdminCartUpload = () => {
                             id="metaDesc"
                             className="form-control"
                             value={ProductData.metaDesc}
-                            {...register("metaDesc")}
+                            {...register("metaDesc", { required: "metaDesc is required" })}
                           />
+                          {errors.metaDesc && (
+                            <p className="text-danger">{errors.metaDesc.message}</p>
+                          )}
                         </div>
                         <div className="col-lg-4 my-2">
                           <label className="form-label" for="veg">
@@ -696,8 +779,11 @@ const AdminCartUpload = () => {
                             id="veg"
                             className="form-control"
                             value={ProductData.veg}
-                            {...register("veg")}
+                            {...register("veg", { required: "veg is required" })}
                           />
+                          {errors.veg && (
+                            <p className="text-danger">{errors.veg.message}</p>
+                          )}
                         </div>
 
                         {/* <div className="file-upload-container col-lg-6">
@@ -726,19 +812,28 @@ const AdminCartUpload = () => {
                             style={{ display: "none" }}
                           />
                         </div> */}
-                        <div className="file-upload-container col-lg-4">
-                          <label htmlFor="file-input" className="file-upload-label">
-                            <div className="file-upload-box">
+                        {/* <div className="file-upload-container col-lg-4 text-center">
+                          <p className="text-start form-label">upload product images</p>
+                          <label htmlFor="file-input" className="file-upload-label border">
+
+                            <div className="file-upload-box text-center">
                               {imageUrl?.length ? (
-                                  <img src={imageUrl} className="file-icon w-100 h-100" />
+                                <img src={imageUrl} className="file-icon modal-main-img shadow" />
                               ) : (
-                                <div className="file-icon">&#128190;</div>
+                                <div className="file-icon px-4 py-3"><FontAwesomeIcon className="h1" icon={faImage} />
+                                <p  className="m-0">uplaod image</p>
+                                </div>
                               )}
                               {selectedFile?.length > 0 ? (
                                 <div className="file-name">{selectedFile.map(file => file.name).join(', ')}</div>
                               ) : (
-                                <div className="file-placeholder">Upload Product Images</div>
+                                <div className="file-placeholder"></div>
                               )}
+                              {fileList?.map((file, index) => (
+                                <span key={index} className="preview-image">
+                                  <img src={file} className="file-icon modal-img m-1 shadow" alt="preview" />
+                                </span>
+                              ))}
                             </div>
                           </label>
                           <input
@@ -748,6 +843,52 @@ const AdminCartUpload = () => {
                             onChange={handleFileChange}
                             style={{ display: "none" }}
                           />
+                          </div> */}
+                        <div className="col-lg-4 my-2">
+                          <label className="form-label">
+                            Upload Image
+                          </label>
+
+                          <label htmlFor="file-input-main" className="file-upload-label d-flex align-items-center mx-2 ">
+                            <FontAwesomeIcon className="border p-4 my-0 h3" icon={faImage} />
+                          {UploadLoading ? (
+                              <>
+                                <span className="d-flex align-items-center">
+                                  <span className="spinner-border mx-3 spinner-border-sm" role="status" aria-hidden="true"></span>
+                                </span>
+                              </>
+                            ) : (
+                              <></>
+                            )}
+                          </label>
+                          <input className='check d-none' id='file-input-main' type="file" multiple onChange={handleImgUpload} />
+
+                          <div className='d-flex mt-3'>
+                            {uploadedUrls.map((image, index) => (
+                              <div key={index} className='m-2'>
+                                <img
+                                  src={image}
+                                  alt={`uploaded-${index}`}
+                                  className=''
+                                  width={100}
+                                  height={100}
+                                />
+                                <div className="d-flex justify-content-end align-items-center">
+                                  <FontAwesomeIcon onClick={() => handleImgRemove(index)} className="mx-2 border p-1" icon={faRemove} />
+                                  <label htmlFor={`file-input-${index}`} className="file-upload-label d-flex align-items-center mx-2 ">
+                                    <FontAwesomeIcon className="border p-1" icon={faUpload} />
+                                  </label>
+                                  <input
+                                    className='d-none'
+                                    type="file"
+                                    id={`file-input-${index}`}
+                                    onChange={(e) => handleImgUpdate(e, index)}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                            
+                          </div>
                         </div>
 
                         <div className="text-center">
@@ -779,3 +920,4 @@ const AdminCartUpload = () => {
 };
 
 export default AdminCartUpload;
+
