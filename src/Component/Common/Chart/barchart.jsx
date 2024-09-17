@@ -10,62 +10,68 @@ import {
   CartesianGrid,
 } from "recharts";
 
-const BarChartNo = () => {
+const BarChartNo = ({barData}) => {
+  console.log('barData: ', barData);
   const data = [
     {
       name: "Micr",
-      Products: 13,
-      fees: "40%",
+      Products: 2,
+      // fees: "4%",
     },
     {
       name: "Minromix",
-      Products: 15,
-      fees: "12%",
+      Products: 1,
+      fees: "4%",
     },
     {
       name: "vita",
-      Products: 28,
-      fees: "14%",
+      Products: 1,
+      fees: "1%",
     },
     {
       name: "Neonato",
-      Products: 13,
-      fees: "70%",
+      Products: 2,
+      fees: "1%",
     },
     {
       name: "Mukti",
-      Products: 13,
-      fees: "30%",
+      Products: 1,
+      fees: "1%",
     },
     {
       name: "Energico",
-      Products: 13,
-      fees: "30%",
+      Products: 1,
+      fees: "1%",
     },
     {
       name: "Digesto",
-      Products: 19,
-      fees: "30%",
+      Products: 3,
+      fees: "1%",
     },
     {
       name: "Liverofine",
-      Products: 13,
-      fees: "30%",
+      Products: 5,
+      fees: "1%",
     },
     {
       name: "D-Cox",
-      Products: 13,
-      fees: "30%",
+      Products: 4,
+      fees: "2%",
     },
     {
       name: "Rumeno Micro Flora",
-      Products: 13,
-      fees: "30%",
+      Products: 1,
+      fees: "3%",
     },
     {
       name: "Lacto-Pup Milk Replacer",
-      Products: 13,
-      fees: "30%",
+      Products: 2,
+      fees: "4%",
+    },
+    {
+      name: "Lr",
+      Products: 2,
+      fees: "4%",
     },
   ];
   return (
@@ -74,7 +80,7 @@ const BarChartNo = () => {
         <BarChart
           width={400}
           height={400}
-          data={data}
+          data={barData}
           margin={{
             top: 5,
             right: 30,

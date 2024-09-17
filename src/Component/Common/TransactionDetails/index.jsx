@@ -12,7 +12,7 @@ const TransactionDetails = () => {
     const fetchItems = async () => {
         try {
             const response = await axios.get(`${apiUrl}/transaction`);
-            setTransactionData(response.data);
+            setTransactionData(response.data?.reverse());
             console.log('response.data.blog: ', response?.data);
         } catch (error) {
             console.error('Error fetching items:', error);
@@ -27,7 +27,6 @@ const TransactionDetails = () => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = transactionData?.slice(indexOfFirstItem, indexOfLastItem);
-
     // Logic for displaying page numbers
     const pageNumbers = [];
     for (let i = 1; i <= Math?.ceil(transactionData?.length / itemsPerPage); i++) {
@@ -53,11 +52,13 @@ const TransactionDetails = () => {
                                                     <th scope="col">#</th>
                                                     <th scope="col">Name</th>
                                                     <th scope="col">Number</th>
+                                                    <th scope="col">Email</th>
                                                     <th scope="col">Address</th>
                                                     <th scope="col">Pay Mode</th>
                                                     <th scope="col">Amount</th>
                                                     <th scope="col">COD Payment</th>
                                                     <th scope="col">Transaction ID</th>
+                                                    <th scope="col">Date</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -66,11 +67,13 @@ const TransactionDetails = () => {
                                                         <th scope="row">{indexOfFirstItem + index + 1}</th>
                                                         <td>{item?.name}</td>
                                                         <td>{item?.mobileNumber}</td>
+                                                        <td>{item?.email}</td>
                                                         <td>{item?.address}</td>
                                                         <td>{item?.paymode}</td>
-                                                        <td>{item?.amount}</td>
-                                                        <td>{item?.cod_payment}</td>
+                                                        <td>{item?.amount?.toLocaleString()}</td>
+                                                        <td>{item?.cod_payment?.toLocaleString()}</td>
                                                         <td>{item?.transactionID}</td>
+                                                        <td>{new Date(item?.createdAt)?.toLocaleString()}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
