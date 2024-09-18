@@ -28,6 +28,8 @@ const AdminCartUpload = () => {
     setValue("keywords", "");
     setValue("heading", "");
     setValue("description", "");
+    setValue("metadescription", "");
+    setValue("script", "");
     setImageUrl(null);
     setSelectedFile(null);
     localStorage.removeItem('storeBlogUrl');
@@ -42,6 +44,7 @@ const AdminCartUpload = () => {
   };
 
   useEffect(() => {
+    console.log('blogs: ', blogs);
     fetchItems();
   }, []);
 
@@ -64,19 +67,21 @@ const AdminCartUpload = () => {
     try {
       const response = await axios.get(`${apiUrl}/get_all_blog`);
       setBlogs(response.data.blog);
+      console.log('response.data.blog: ', response.data.blog);
     } catch (error) {
       console.error('Error fetching items:', error);
     }
   };
 
   const uploadImage = async () => {
+    const apiKey = "273ab24b40be59dc593d96c50976ae42"
     if (selectedFile) {
       const formData = new FormData();
       formData.append("image", selectedFile);
 
       try {
         const uploadImgResponse = await axios.post(
-          `https://api.imgbb.com/1/upload?key=${process.env.REACT_APP_API_IMAGE}`,
+          `https://api.imgbb.com/1/upload?key=${apiKey}`,
           formData
         );
         return uploadImgResponse.data.data.url;
@@ -103,6 +108,8 @@ const AdminCartUpload = () => {
       content: data.content,
       heading: data.heading,
       description: data.description,
+      metadescription: data.metadescription,
+      script: data.script,
       keywords: data.keywords,
       image: imageUrl,
     };
@@ -137,6 +144,8 @@ const AdminCartUpload = () => {
     setValue("keywords", blogs[index].keywords);
     setValue("heading", blogs[index].heading);
     setValue("description", blogs[index].description);
+    setValue("metadescription",blogs[index].metadescription);
+    setValue("script",blogs[index].script);
     setImageUrl(blogs[index].image);
     setSelectedFile(null); // Clear the selected file when editing
     setSelectedItem(index);
