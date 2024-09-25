@@ -41,26 +41,6 @@ const AdminCartUpload = () => {
     }
   };
 
-  const handleFileChange = (e) => {
-    try {
-      const files = Array.from(e.target.files);
-      setSelectedFile(files);
-      // let element = []
-      // for (let index = 0; index < files?.length; index++) {
-      //   element.push(URL.createObjectURL(files[index]));
-      // }
-      // localStorage.setItem("multiImg", JSON.stringify(element))
-      // setFileList(JSON.parse(localStorage.getItem("multiImg")));
-      const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
-      reader.onload = () => {
-        setImageUrl(reader.result);
-      };
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
 
 
   const handleOpenDialog = () => {
@@ -86,6 +66,7 @@ const AdminCartUpload = () => {
     setValue("imgtext", "");
     setValue("script", "");
     setValue("video", "");
+    setValue("stock", "");
     setImageUrl(null);
     setSelectedFile(null);
     setUploadedUrls([])
@@ -113,6 +94,8 @@ const AdminCartUpload = () => {
     setValue("imgtext", "");
     setValue("script", "");
     setValue("video", "");
+    setValue("stock", "");
+
     setImageUrl(null);
     setSelectedFile(null);
     setSelectedItem(null);
@@ -153,28 +136,59 @@ const AdminCartUpload = () => {
   const handleImgUpload = async (e) => {
     setUploadLoading(true);
     const files = Array.from(e.target.files);
-    
+    const validImages = [];
+
+    // Validate file type and size
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
+      // Check if file is an image (you can check for other image types as well)
+      const validImageTypes = ['image/jpeg', 'image/png'];
+      if (!validImageTypes.includes(file.type)) {
+        alert(`File ${file.name} is not a valid image. Please upload a JPG, PNG.`);
+        console.error(`File ${file.name} is not a valid image. Please upload a JPG, PNG.`);
+        continue; // Skip this file
+      }
+
+      // Check if the file size is less than 5MB (or any other limit)
+      const maxSizeInMB = 5; // Maximum file size in MB
+      if (file.size > maxSizeInMB * 1024 * 1024) {
+        alert(`File ${file.name} exceeds the size limit of ${maxSizeInMB}MB.`);
+        console.error(`File ${file.name} exceeds the size limit of ${maxSizeInMB}MB.`);
+        continue; // Skip this file
+      }
+
+      validImages.push(file);
+    }
+
+    if (validImages.length === 0) {
+      console.error('No valid images to upload.');
+      setUploadLoading(false);
+      return; // Exit if no valid images
+    }
+
     try {
-      const newUploadedUrls = await uploadImagesToApi(files);
+      const newUploadedUrls = await uploadImagesToApi(validImages);
       if (newUploadedUrls) {
         setUploadLoading(false);
       }
-  
+
       // Get previously uploaded URLs or initialize an empty array if none exist
       let getPrevUrl = JSON.parse(localStorage.getItem('storeUrl')) || [];
-  
+
       // Merge the old and new URLs
       let merge = [...getPrevUrl, ...newUploadedUrls];
       setUploadedUrls((prevUrls) => prevUrls.concat(newUploadedUrls));
-  
+
       // Store the updated URLs in localStorage
       localStorage.setItem('storeUrl', JSON.stringify(merge));
     } catch (error) {
+      alert("Error uploading images:", error);
       console.error("Error uploading images:", error);
       setUploadLoading(false);
     }
   };
-  
+
 
   const handleImgRemove = (index) => {
     const newUploadedUrls = uploadedUrls.filter((_, i) => i !== index);
@@ -182,18 +196,32 @@ const AdminCartUpload = () => {
     localStorage.setItem('storeUrl', JSON.stringify(newUploadedUrls));
   };
 
+
   const handleImgUpdate = async (e, index) => {
     const file = e.target.files[0];
+
     if (file) {
+      // Validate if the file is an image
+      const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!validImageTypes.includes(file.type)) {
+        alert('Please upload a valid image file (JPEG, PNG, or GIF).');
+        return;
+      }
+
+      // Validate file size (2 MB limit)
+      const maxSizeInBytes = 2 * 1024 * 1024; // 2 MB
+      if (file.size > maxSizeInBytes) {
+        alert('Please upload an image smaller than 2 MB.');
+        return;
+      }
+
       setUploadLoading(true);
 
       const newUploadedUrls = await uploadImagesToApi([file]);
 
       if (newUploadedUrls.length > 0) {
+        setUploadLoading(false);
 
-        if (newUploadedUrls) {
-          setUploadLoading(false);
-        }
         const updatedUrls = uploadedUrls?.map((img, i) =>
           i === index ? newUploadedUrls[0] : img
         );
@@ -203,6 +231,7 @@ const AdminCartUpload = () => {
       }
     }
   };
+
   // ---------------
 
 
@@ -236,6 +265,7 @@ const AdminCartUpload = () => {
       imgText: data.imgtext,
       script: data.script,
       video: data.video,
+      stock: data.stock,
     };
 
     try {
@@ -281,6 +311,7 @@ const AdminCartUpload = () => {
     setValue("imgtext", product?.imgText);
     setValue("script", product?.script);
     setValue("video", product?.video);
+    setValue("stock", product?.stock);
     setImageUrl(product?.img?.length > 0 ? product?.img[0] : null);
     setFileList(product?.img?.length > 0 ? product?.img : null)
     setUploadedUrls(product?.img?.length > 0 ? product?.img : [])
@@ -325,21 +356,6 @@ const AdminCartUpload = () => {
                             <h5 className="card-title">{product.name}</h5>
                             <h5 className="card-title">{product.priceText}</h5>
                             <h5 className="card-title">{product.Weight}</h5>
-                            {/* <p className="card-text text-truncate">
-                              {product.description}
-                            </p>
-                            <p className="card-text text-truncate">
-                              {product.Shortdescription}
-                            </p> */}
-                            {/* <p className="card-text text-truncate">
-                              {product.Instruction}
-                            </p>
-                            <p className="card-text text-truncate">
-                              {product.imgText}
-                            </p>
-                            <p className="card-text text-truncate">
-                              {product.Type}
-                            </p> */}
                             <p className="card-text text-truncate">
                               {product.Category}
                             </p>
@@ -785,73 +801,35 @@ const AdminCartUpload = () => {
                             <p className="text-danger">{errors.veg.message}</p>
                           )}
                         </div>
-
-                        {/* <div className="file-upload-container col-lg-6">
-                          <label htmlFor="file-input" className="file-upload-label">
-                            <div className="file-upload-box">
-                              {imageUrl ? (
-                                <img
-                                  src={imageUrl}
-                                  alt="Uploaded"
-                                  className="file-icon w-100 h-100"
-                                />
-                              ) : (
-                                <div className="file-icon">&#128190;</div>
-                              )}
-                              {selectedFile ? (
-                                <div className="file-name">{selectedFile.name}</div>
-                              ) : (
-                                <div className="file-placeholder">Upload Product Image</div>
-                              )}
-                            </div>
+                        <div className="col-lg-3 my-2">
+                          <label className="form-label" for="stock">
+                            Stock
                           </label>
                           <input
-                            type="file"
-                            id="file-input"
-                            onChange={handleFileChange}
-                            style={{ display: "none" }}
+                            name="stock"
+                            placeholder="Stock Quantity"
+                            type="number"
+                            id="stock"
+                            className="form-control"
+                            value={ProductData.stock}
+                            {...register("stock", { required: "stock quantity is required" })}
                           />
-                        </div> */}
-                        {/* <div className="file-upload-container col-lg-4 text-center">
-                          <p className="text-start form-label">upload product images</p>
-                          <label htmlFor="file-input" className="file-upload-label border">
+                          {errors?.stock && (
+                            <p className="text-danger">{errors.stock.message}</p>
+                          )}
+                        </div>
 
-                            <div className="file-upload-box text-center">
-                              {imageUrl?.length ? (
-                                <img src={imageUrl} className="file-icon modal-main-img shadow" />
-                              ) : (
-                                <div className="file-icon px-4 py-3"><FontAwesomeIcon className="h1" icon={faImage} />
-                                <p  className="m-0">uplaod image</p>
-                                </div>
-                              )}
-                              {selectedFile?.length > 0 ? (
-                                <div className="file-name">{selectedFile.map(file => file.name).join(', ')}</div>
-                              ) : (
-                                <div className="file-placeholder"></div>
-                              )}
-                              {fileList?.map((file, index) => (
-                                <span key={index} className="preview-image">
-                                  <img src={file} className="file-icon modal-img m-1 shadow" alt="preview" />
-                                </span>
-                              ))}
-                            </div>
-                          </label>
-                          <input
-                            type="file"
-                            id="file-input"
-                            multiple
-                            onChange={handleFileChange}
-                            style={{ display: "none" }}
-                          />
-                          </div> */}
-                        <div className="col-lg-4 my-2">
+
+
+
+                        <div className="col-lg-12 my-2">
                           <label className="form-label">
                             Upload Image
                           </label>
 
                           <label htmlFor="file-input-main" className="file-upload-label d-flex align-items-center mx-2 ">
                             <FontAwesomeIcon className="border p-4 my-0 h3" icon={faImage} />
-                          {UploadLoading ? (
+                            {UploadLoading ? (
                               <>
                                 <span className="d-flex align-items-center">
                                   <span className="spinner-border mx-3 spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -863,9 +841,9 @@ const AdminCartUpload = () => {
                           </label>
                           <input className='check d-none' id='file-input-main' type="file" multiple onChange={handleImgUpload} />
 
-                          <div className='d-flex mt-3'>
+                          <div className='row mt-3'>
                             {uploadedUrls.map((image, index) => (
-                              <div key={index} className='m-2'>
+                              <div key={index} className='m-2 w-auto'>
                                 <img
                                   src={image}
                                   alt={`uploaded-${index}`}
@@ -887,7 +865,7 @@ const AdminCartUpload = () => {
                                 </div>
                               </div>
                             ))}
-                            
+
                           </div>
                         </div>
 

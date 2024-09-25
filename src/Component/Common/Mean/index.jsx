@@ -23,7 +23,7 @@ const Mean = () => {
         <ul className="menu-inner py-1">
           {/* <!-- Dashboard --> */}
           <li className="menu-item">
-            <NavLink to="/" className="menu-link">
+            <NavLink to="/home" className="menu-link">
               <i className="menu-icon tf-icons fw-bold bx bx-home-circle"></i>
               <div data-i18n="Analytics">Dashboard</div>
             </NavLink>

@@ -12,6 +12,8 @@ import CcPrimary from "../../assets/img/icons/unicons/cc-primary.png";
 import BarChart from "../../Common/Chart/barchart";
 import PieChartNo from "../../Common/Chart/pieChart";
 import Table from "../../Common/Table";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSortAmountUp } from "@fortawesome/free-solid-svg-icons";
 const Home = () => {
   const apiUrl = `${process.env.REACT_APP_API_DASHBOARD}`;
 
@@ -24,7 +26,7 @@ const Home = () => {
   const fetchDashboardData = async () => {
     try {
       const response = await axios.get(`${apiUrl}/dashboard`)
-      setdashData( response?.data);
+      setdashData(response?.data);
       console.log('response?.data: ', response?.data);
     } catch (error) {
       console.log('error: ', error);
@@ -124,8 +126,11 @@ const Home = () => {
                               </div>
 
                             </div>
-                            <span>Sales</span>
-                            <h3 className="card-title text-nowrap mb-1">{dashData?.totalsale}</h3>
+                            <span className="fw-semibold d-block mb-1">Sales</span>
+                            <h3 className="card-title text-nowrap mb-2"><FontAwesomeIcon className="h5 m-0" icon={faSortAmountUp} /> {Intl.NumberFormat('en-US', {
+                              notation: "compact",
+                              maximumFractionDigits: 1
+                            }).format(dashData?.totalSales)}</h3>
                             <small className="text-success fw-semibold">
                               <i className="bx bx-up-arrow-alt"></i> +28.42%
                             </small>
@@ -142,7 +147,7 @@ const Home = () => {
                           <h5 className="card-header m-0 me-2 pb-3">
                             Total Revenue
                           </h5>
-                          <PieChartNo pieData={dashData?.piechart} />
+                          <PieChartNo pieData={dashData?.pieChart} />
                         </div>
                         <div className="col-md-6">
                           <div className="chart">
@@ -151,19 +156,22 @@ const Home = () => {
                             </div>
 
                             <div className="row justify-content-between">
-                              {dashData?.sixMonth?.map((item,index)=>(
+                              {dashData?.sixMonth?.map((item, index) => (
                                 <>
-                              <div className="d-flex justify-content-center align-items-center  my-3 col-lg-6">
-                                <div className="me-2">
-                                  <span className="badge bg-label-primary p-2">
-                                    <i className="bx bx-dollar text-primary"></i>
-                                  </span>
-                                </div>
-                                <div className="d-flex flex-column">
-                                  <small>{item?.date}</small>
-                                  <h6 className="mb-0">₹ {item?.totalAmount?.toLocaleString()}</h6>
-                                </div>
-                              </div>
+                                  <div className="d-flex justify-content-center align-items-center  my-3 col-lg-6">
+                                    <div className="me-2">
+                                      <span className="badge bg-label-primary p-2">
+                                        <i className="bx bx-dollar text-primary"></i>
+                                      </span>
+                                    </div>
+                                    <div className="d-flex flex-column">
+                                      <small>{item?.date}</small>
+                                      <h6 className="mb-0">₹ {Intl.NumberFormat('en-US', {
+                                        notation: "compact",
+                                        maximumFractionDigits: 1
+                                      }).format(item?.totalAmount)}</h6>
+                                    </div>
+                                  </div>
                                 </>
                               ))}
                             </div>
@@ -189,7 +197,10 @@ const Home = () => {
 
                             </div>
                             <span className="d-block mb-1">Total Amount</span>
-                            <h3 className="card-title text-nowrap mb-2">₹ {dashData?.totalPayment?.toLocaleString()}</h3>
+                            <h3 className="card-title text-nowrap mb-2">₹ {Intl.NumberFormat('en-US', {
+                              notation: "compact",
+                              maximumFractionDigits: 1
+                            }).format(dashData?.totalPayment)}</h3>
                             <small className="text-danger fw-semibold">
                               <i className="bx bx-down-arrow-alt"></i> -14.82%
                             </small>
@@ -211,7 +222,10 @@ const Home = () => {
                             <span className="fw-semibold d-block mb-1">
                               Transactions
                             </span>
-                            <h3 className="card-title mb-2">₹ {dashData?.lastTransaction?.toLocaleString()}</h3>
+                            <h3 className="card-title mb-2">₹ {Intl.NumberFormat('en-US', {
+                              notation: "compact",
+                              maximumFractionDigits: 1
+                            }).format(dashData?.lastTransaction)}</h3>
                             <small className="text-success fw-semibold">
                               <i className="bx bx-up-arrow-alt"></i> +28.14%
                             </small>
@@ -226,7 +240,7 @@ const Home = () => {
                 <div className="col-lg-12  mb-4">
                   <div className="card">
                     <div className="card-body">
-                      <BarChart barData={dashData?.bargraph} />
+                      <BarChart barData={dashData?.barGraph} />
                     </div>
                   </div>
                 </div>

@@ -2,6 +2,7 @@ import React from "react";
 import { PieChart, Pie,Tooltip } from 'recharts';
 
 const PieChartNo = ({pieData}) => {
+  console.log('pieData: ', pieData);
     const data   = [
         { value: 400 },
         { value: 300 },
@@ -18,7 +19,7 @@ const PieChartNo = ({pieData}) => {
             dataKey="value"
             startAngle={360}
             endAngle={0}
-            data={data}
+            data={pieData}
             cx="50%"
             cy="50%"
             outerRadius={80}
