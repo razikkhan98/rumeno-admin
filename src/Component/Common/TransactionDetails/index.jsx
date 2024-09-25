@@ -13,7 +13,7 @@ const TransactionDetails = () => {
         try {
             const response = await axios.get(`${apiUrl}/transaction`);
             setTransactionData(response.data?.reverse());
-            console.log('response.data.blog: ', response?.data);
+            console.log('response.transaction: ', response?.data);
         } catch (error) {
             console.error('Error fetching items:', error);
         }

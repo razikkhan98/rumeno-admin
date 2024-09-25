@@ -170,9 +170,9 @@ const ImageUpload = () => {
       </label>
       <input className='check d-none' id='file-input-main' type="file" multiple onChange={handleImgUpload} />
       
-      <div className='d-flex mt-3'>
+      <div className='row mt-3'>
         {uploadedUrls.map((image, index) => (
-          <div key={index} className='m-2'>
+          <div key={index} className='w-auto m-2'>
             <img
               src={image}
               alt={`uploaded-${index}`}

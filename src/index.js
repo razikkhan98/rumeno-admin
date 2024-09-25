@@ -18,6 +18,7 @@ import './Component/assets/vendor/js/bootstrap.js'
 
 
 import './Component/assets/vendor/libs/jquery/jquery.js'
+import { BrowserRouter } from 'react-router-dom';
 
 
 
@@ -26,9 +27,9 @@ import './Component/assets/vendor/libs/jquery/jquery.js'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <BrowserRouter>
+  <App />
+</BrowserRouter>
 );
 
 // If you want to start measuring performance in your app, pass a function

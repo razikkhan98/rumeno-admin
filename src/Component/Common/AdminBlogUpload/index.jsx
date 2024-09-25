@@ -48,20 +48,56 @@ const AdminCartUpload = () => {
     fetchItems();
   }, []);
 
+  // const handleFileChange = (e) => {
+  //   try {
+  //     const files = Array.from(e.target.files);
+  //     setSelectedFile(files[0]);
+
+  //     const reader = new FileReader();
+  //     reader.readAsDataURL(files[0]);
+  //     reader.onload = () => {
+  //       setImageUrl(reader.result);
+  //     };
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+
   const handleFileChange = (e) => {
     try {
-      const files = Array.from(e.target.files);
-      setSelectedFile(files[0]);
-
+      const file = e.target.files[0];
+      
+      // Check if the file is an image
+      if (!isImage(file)) {
+        alert('This is not a valid image. Please upload a JPG, PNG..');
+        throw new Error('Invalid file type');
+      }
+  
+      // Validate file size
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        alert('File size exceeds 5MB limit.');
+        throw new Error('File too large');
+      }
+  
+      setSelectedFile(file);
       const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
+      reader.readAsDataURL(file);
       reader.onload = () => {
         setImageUrl(reader.result);
       };
     } catch (error) {
       console.log(error);
+      // Handle error (e.g., show error message to user)
     }
   };
+  
+  // Helper function to check if the file is an image
+  function isImage(file) {
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    return validTypes.includes(file.type);
+  }
+  
 
   const fetchItems = async () => {
     try {

@@ -1,25 +1,16 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import './App.css';
-import AdminCartUpload from './Component/Common/AdminCartUpload';
-import Home from './Component/Pages/Home';
-import BlogUpload from './Component/Common/AdminBlogUpload';
-import TransactionDetails from './Component/Common/TransactionDetails';
+import "./App.css";
 
+import { UserProvider } from "./Component/Common/UseContext/useContext";
+
+import AuthRoutes from "./routes/routes";
 
 function App() {
   return (
-    
     <div className="App">
-      <BrowserRouter>
-       <Routes>
-         <Route path="/" element={<Home />} />
-         <Route path="uploadproduct" element={<AdminCartUpload />} />
-         <Route path="upload-blog" element={<BlogUpload />} />
-         <Route path="transaction-details" element={<TransactionDetails />} />
-       </Routes>
-       </BrowserRouter>
+      <UserProvider>
+          <AuthRoutes />
+      </UserProvider>
     </div>
-      
   );
 }
 
