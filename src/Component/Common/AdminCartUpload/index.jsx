@@ -357,7 +357,7 @@ const AdminCartUpload = () => {
                             <h5 className="card-title">{product.priceText}</h5>
                             <h5 className="card-title">{product.Weight}</h5>
                             <p className="card-text text-truncate">
-                              {product.Category}
+                              {` ${product.Category}`}
                             </p>
                             <span className="text-center mx-2">
                               <button className="btn btn-warning w-auto mx-2" onClick={() => handleEdit(index)}>
@@ -825,6 +825,7 @@ const AdminCartUpload = () => {
                         <div className="col-lg-12 my-2">
                           <label className="form-label">
                             Upload Image
+                          <p className="text-danger m-0">Image Size 500 x 500</p>
                           </label>
 
                           <label htmlFor="file-input-main" className="file-upload-label d-flex align-items-center mx-2 ">
